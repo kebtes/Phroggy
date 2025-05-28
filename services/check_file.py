@@ -1,7 +1,6 @@
 from pathlib import Path
 import asyncio
 import aiohttp
-import hashlib
 import aiofiles
 
 from config.secrets import VIRUS_TOTAL_API_KEY
@@ -40,7 +39,7 @@ async def check_file(file_path: str):
         file_extension = Path(file_path).suffix
 
         if file_extension not in ACCEPTED_FILE_TYPES:
-            return ["ERROR_FILE_TYPE_NOT_SUPPORTED"]
+            return {"error": "ERROR_FILE_TYPE_NOT_SUPPORTED", "file_type": file_extension}
         
         analysis_id = await send_file_for_scan(file_path)
         return await get_scan_report(analysis_id)
@@ -115,15 +114,3 @@ async def get_scan_report(analysis_id: int, max_retries: int = 20, delay: int = 
 
 #     async with aiohttp.ClientSession() as session:
 #         try:
-
-async def calc_sha256(file_path: str):
-    sha256_hash = hashlib.sha256()
-
-    async with aiofiles.open(file_path, "rb") as f:
-        while True:
-            chunk = await f.read(8192)
-            if not chunk:
-                break
-            sha256_hash.update(chunk)
-
-    return sha256_hash.hexdigest()
