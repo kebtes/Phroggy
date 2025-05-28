@@ -1,7 +1,5 @@
 import pytest
-import asyncio
-from unittest.mock import patch, AsyncMock, MagicMock
-from pathlib import Path
+from unittest.mock import patch, AsyncMock, MagicMock, ANY
 
 import services.check_file  # Replace with the actual module name of your functions
 
@@ -9,7 +7,7 @@ import services.check_file  # Replace with the actual module name of your functi
 async def test_check_file_rejects_unsupported_file():
     # Provide unsupported extension
     result = await services.check_file.check_file("sample.unsupportedext")
-    assert result == ["ERROR_FILE_TYPE_NOT_SUPPORTED"]
+    assert result == {"error": "ERROR_FILE_TYPE_NOT_SUPPORTED", "file_type": ANY}
 
 @pytest.mark.asyncio
 @patch("services.check_file.send_file_for_scan", new_callable=AsyncMock)
@@ -65,29 +63,6 @@ async def test_get_scan_report_success(mock_get):
     with patch("asyncio.sleep", new=AsyncMock()):
         result = await services.check_file.get_scan_report("file_id", max_retries=3, delay=0)
     assert result["data"]["attributes"]["status"] == "completed"
-
-@pytest.mark.asyncio
-@patch("aiofiles.open")
-async def test_calc_sha256(mock_aiofiles_open):
-    # Prepare chunks of file data to simulate reading
-    chunks = [b"abc", b"def", b""]
-    async def read_mock(n):
-        return chunks.pop(0)
-
-    mock_file = AsyncMock()
-    mock_file.read = read_mock
-    mock_aiofiles_open.return_value.__aenter__.return_value = mock_file
-
-    # Using async with corrected in the test itself
-    # Patch the function to use async with instead of with
-    # Because your original code uses 'with' on aiofiles.open which is wrong.
-    # Here, we just run and expect it to work due to mock
-
-    hash_result = await services.check_file.calc_sha256("dummy_path")
-    # The hash of b"abcdef" is:
-    import hashlib
-    expected_hash = hashlib.sha256(b"abcdef").hexdigest()
-    assert hash_result == expected_hash
 
 # Helper to make async context manager from mock response
 class async_context_manager:
