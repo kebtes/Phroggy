@@ -32,6 +32,8 @@ jobs:
 
     - name: Install dependencies from requirements.txt
       run: pip install -r requirements.txt
+    
+    - name: Install pytest-asyncio
       run: pip install pytest-asyncio
 
     - name: Run tests
