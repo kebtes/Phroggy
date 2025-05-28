@@ -4,6 +4,7 @@ import aiohttp
 import aiofiles
 
 from utils.hash_calc import calc_sha256
+from utils.file_protection import password_protected
 from config.secrets import VIRUS_TOTAL_API_KEY
 
 CATEGORIES = ['malicious', 'suspicious']
@@ -35,13 +36,25 @@ async def check_file(file_path: str):
     """
     Main entry point to scan a file and return a report and flag status.
     """
+    
+    COMPRESSED_FILE_TYPES = [".zip", ".rar", ".7z", ".tar", ".gz", ".bz2"]
+    
     try:
+
         # check file type before moving forward
         file_extension = Path(file_path).suffix
 
         if file_extension not in ACCEPTED_FILE_TYPES:
             return {"error": "ERROR_FILE_TYPE_NOT_SUPPORTED", "file_type": file_extension}
 
+        if file_extension in COMPRESSED_FILE_TYPES:
+            try:
+                if password_protected(file_extension):
+                    return {"error": "ERROR_PASSWORD_PROTECTED", "file_type": file_extension}
+            
+            except ValueError as e:
+                pass
+        
         # Check if a scan for the file already exists by sending a GET request using its SHA-256 hash
         sha256 = await calc_sha256(str(file_path))
         response = await get_result_by_sha256(sha256)
@@ -137,5 +150,3 @@ async def get_result_by_sha256(sha256: int):
         
         except aiohttp.ClientError() as e:
             return {"error": "CLIENT_ERROR", "data": str(e)}
-        
-            
