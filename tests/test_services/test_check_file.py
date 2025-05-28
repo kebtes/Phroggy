@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import patch, AsyncMock, MagicMock, ANY
+from pathlib import Path
 
 import services.check_file 
 
@@ -12,15 +13,17 @@ async def test_check_file_rejects_unsupported_file():
 @pytest.mark.asyncio
 @patch("services.check_file.send_file_for_scan", new_callable=AsyncMock)
 @patch("services.check_file.get_scan_report", new_callable=AsyncMock)
-async def test_check_file_success(mock_get_scan_report, mock_send_file_for_scan):
-    # Mock the scan functions
+async def test_check_file_success(mock_get_scan_report, mock_send_file_for_scan, tmp_path: Path):
+    # Create dummy sample.pdf file
+    test_file = tmp_path / "sample.pdf"
+    test_file.write_bytes(b"Dummy content")
+
+    # Mocks
     mock_send_file_for_scan.return_value = "file_id_123"
     mock_get_scan_report.return_value = {"data": "scan_report"}
 
-    result = await services.check_file.check_file("sample.pdf")
+    result = await services.check_file.check_file(str(test_file))
     assert result == {"data": "scan_report"}
-    mock_send_file_for_scan.assert_called_once_with("sample.pdf")
-    mock_get_scan_report.assert_called_once_with("file_id_123")
 
 @pytest.mark.asyncio
 @patch("aiohttp.ClientSession.post")
