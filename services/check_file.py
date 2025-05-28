@@ -3,6 +3,7 @@ import asyncio
 import aiohttp
 import aiofiles
 
+from utils.hash_calc import calc_sha256
 from config.secrets import VIRUS_TOTAL_API_KEY
 
 CATEGORIES = ['malicious', 'suspicious']
@@ -40,10 +41,20 @@ async def check_file(file_path: str):
 
         if file_extension not in ACCEPTED_FILE_TYPES:
             return {"error": "ERROR_FILE_TYPE_NOT_SUPPORTED", "file_type": file_extension}
+
+        # Check if a scan for the file already exists by sending a GET request using its SHA-256 hash
+        sha256 = await calc_sha256(str(file_path))
+        response = await get_result_by_sha256(sha256)
+
+        # if "error" in response and response["error"] == "NOT_FOUND":
+        #     analysis_id = await send_file_for_scan(file_path)
+        #     return await get_scan_report(analysis_id)
         
+        # return await get_result_by_sha256(sha256)
+    
         analysis_id = await send_file_for_scan(file_path)
         return await get_scan_report(analysis_id)
-        
+    
     except Exception as e:
         print(f"[Error] Scan failed: {e}")
         return None
@@ -73,7 +84,7 @@ async def send_file_for_scan(file_path: str):
                     # return result
     
     except aiohttp.ClientError as e:
-        return ("HTTP_ERROR_FAILED_TO_SEND_FILE", str(e))
+        return ("CLIENT_ERROR", str(e))
     
     except aiohttp.ContentTypeError:
         return ("JSON_ERROR_FAILED_TO_PARSE_ERROR")
@@ -106,11 +117,25 @@ async def get_scan_report(analysis_id: int, max_retries: int = 20, delay: int = 
             return ("KEY_ERROR_MISSING_DATA_ID", None)
         
         except aiohttp.ClientError as e:
-            return ("HTTP_ERROR_FAILED_TO_FETCH", str(e))
+            return {"error": "CLIENT_ERROR", "data": str(e)}
     
-# async def check_if_scan_exists(analysis_id: int):
-#     url = f"https://www.virustotal.com/api/v3/files/{file_id}"
-#     headers = {'x-apikey': VIRUS_TOTAL_API_KEY}
+async def get_result_by_sha256(sha256: int):
+    url = f"https://www.virustotal.com/api/v3/files/{sha256}"
+    headers = {'x-apikey': VIRUS_TOTAL_API_KEY}
 
-#     async with aiohttp.ClientSession() as session:
-#         try:
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(url=url, headers=headers) as response:
+                response.raise_for_status()
+                result : dict = await response.json()
+
+                error = result.get("error")
+                if isinstance(error, dict) and error.get("code") == "NotFoundError":
+                    return {"error", "NOT_FOUND"}
+                    
+                return result
+        
+        except aiohttp.ClientError() as e:
+            return {"error": "CLIENT_ERROR", "data": str(e)}
+        
+            
