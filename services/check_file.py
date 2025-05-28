@@ -63,7 +63,7 @@ async def send_file_for_scan(file_path: str):
                 file_data = await f.read()
                 data = aiohttp.FormData()
 
-                file_name = file_path.name
+                file_name = Path(file_path).name
                 # data.add_field("file", file_data, filename=file_path.split('/')[-1], content_type="application/octet-stream")
                 data.add_field("file", file_data, filename=file_name, content_type="application/octet-stream")
 
