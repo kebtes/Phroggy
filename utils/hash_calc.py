@@ -30,7 +30,7 @@ async def calc_sha1(file_path: str):
                 break
             sha1_hash.update(chunk)
         
-    return sha1_hash
+    return sha1_hash.hexdigest()
 
 async def calc_md5(file_path: str):
     md5_hash = hashlib.md5()
@@ -42,4 +42,4 @@ async def calc_md5(file_path: str):
                 break
             md5_hash.update(chunk)
         
-    return md5_hash
+    return md5_hash.hexdigest()
