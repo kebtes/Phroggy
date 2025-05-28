@@ -10,32 +10,39 @@ from core.handlers.commands import router
 
 current_prompts = []
 
-TEMPLATE = """
-🌐 <b>URL:</b> <i>{url}</i> 
-🔒 <b>Status:</b> <i>{status}</i>  
-⚠️ <b>Threats Detected:</b> <i>{threats}</i>    
-"""
-
 async def get_template_response(report):
+    TEMPLATE = (
+        "{url}\n\n"
+        "<u><b>📌Results</b></u>\n"
+        "<b>Result:</b> {result}\n"
+        "<b>Detected Threats:</b> {threats_found}\n"
+        "<b>Date Scanned:</b> {date_scanned}\n\n"
+        "<b><i>{footer}</i></b>"
+    )
+
     threat_found, threat_report = report
 
     if not threat_report:
         return "No link found in this message."
+
+    res = "Malicious" if threat_found else "No Threats Found"
     
-    output = "<b>Here's what I found about the link you sent.</b>\n\n"
-
     for url, threats in threat_report.items():
-        status = "✅ Looks safe to me!" if not threats else "❌ Not safe!"
-        threats_text = ",".join(threats) if threats else "None"
+        capitalized = [threat.capitalize() for threat in threats]
+        threats_text = ",".join(capitalized) if threats else "None"
 
-        output += TEMPLATE.format(url=url, status=status, threats=threats_text) + "\n\n"
-
-    if threat_found:
-        now = pendulum.now("UTC").format("YYYY-MM-DD HH:mm:ss")
-        output += f"⏰ <b>Scanned on:</b> <i>{now}</i>"
-
-    else:
-        output = "✅ Looks safe to me!"
+    now = pendulum.now("UTC").format("YYYY-MM-DD HH:mm:ss")
+    
+    FOOTER_1 = "<b><i>This link appears to be unsafe and could potentially harm your device or compromise your personal information. For your safety, please refrain from clicking on it or sharing it with others.</i></b>"
+    FOOTER_2 = "<b><i>No suspicious content was found in this link. It appears safe for now, but please remain cautious when interacting with unfamiliar links.</i></b>"
+    
+    output = TEMPLATE.format(
+        url          = url,
+        result       = res,
+        threats_found = threats_text,
+        footer       = FOOTER_1 if res == "Malicious" else FOOTER_2,  
+        date_scanned = now
+    )
 
     return output.strip()
 
