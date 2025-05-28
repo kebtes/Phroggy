@@ -32,7 +32,7 @@ dependencies = [
     "pytest==8.3.5",
     "python-dateutil==2.9.0.post0",
     "python-dotenv==1.1.0",
-    "rarfile==4.2"
+    "rarfile==4.2",
     "requests==2.32.3",
     "six==1.17.0",
     "soupsieve==2.7",
