@@ -115,17 +115,27 @@ async def handle_file(message: types.Message, state: FSMContext):
 
             response = await check_file(absolute_file_path)
             
-            if "error" in response and response["error"] == "ERROR_FILE_TYPE_NOT_SUPPORTED":
-                file_type = response["file_type"]
-                response_msg = (
-                    f"Sorry, we don't support <b>{file_type}</b> file types at the moment.\n\n"
-                    "<u><b>Accepted file types include</b></u>\n"
-                    "<code>"
-                    f"{", ".join(ACCEPTED_FILE_TYPES)}"
-                    "</code>\n\n"
-                    "Please upload a <b>supported</b> file format."
-                )
-                await message.reply(response_msg)
+            if "error" in response:
+                error = response["error"]
+                if error == "ERROR_FILE_TYPE_NOT_SUPPORTED":
+                    file_type = response["file_type"]
+                    response_msg = (
+                        f"Sorry, we don't support <b>{file_type}</b> file types at the moment.\n\n"
+                        "<u><b>Accepted file types include</b></u>\n"
+                        "<code>"
+                        f"{", ".join(ACCEPTED_FILE_TYPES)}"
+                        "</code>\n\n"
+                        "Please upload a <b>supported</b> file format."
+                    )
+                    await message.reply(response_msg)
+                
+                elif error == "ERROR_PASSWORD_PROTECTED":
+                    response_msg = (
+                        "This file appears to be <b>password-protected</b> and cannot be processed automatically. "
+                        "Please provide an unprotected version of the file."
+                    )
+
+                    await message.reply(response_msg)
                     
             else:
                 report, _ = await analyze_report(response, file_name=document.file_name)
