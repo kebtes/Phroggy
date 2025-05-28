@@ -11,28 +11,11 @@ from aiogram.fsm.context import FSMContext
 from bot.states import ScanFileStates
 from services.check_file import check_file
 from core.handlers.commands import router
+from services.check_file import ACCEPTED_FILE_TYPES
 
 current_prompts = []
 
 FILE_SIZE_LIMIT = 20 * 10**6
-
-REPORT_TEMPLATE = """
-<b>FILE SCAN REPORT</b>
-
-<b>File Name:</b> <i>{file_name}</i>
-<b>Scan Status:</b> <i>{status}</i>
-<b>Date Scanned:</b> <i>{scan_date}</i>
-<b>SHA-256 Hash:</b> <i>{sha256}</i>
-
-<b>🔍 Detection Summary:</b>
-- Malicious: {malicious}
-- Suspicious: {suspicious}
-- Harmless: {harmless}
-- Undetected: {undetected}
-- Timeout: {timeout}
-
-<a href="https://www.virustotal.com/gui/file/{sha256}/detection">🔗 View Full Report</a>
-"""
 
 async def analyze_report(report: dict, file_name: str):
     """
@@ -45,6 +28,27 @@ async def analyze_report(report: dict, file_name: str):
     THRESHOLD = 0.5
     CATEGORIES = ['malicious', 'suspicious']
 
+    REPORT_TEMPLATE = (
+        "<b>{file_name}</b>\n\n"
+
+        "<b>Scan Status:</b> {status}\n"
+        "<b>Date Scanned:</b> {scan_date}\n\n"
+
+        "🔑 <u><b>Hash</b></u>\n"
+        "<b>MD5 Hash: </b> <code>{md5}</code>\n"
+        "<b>SHA-256 Hash: </b> <code>{sha256}</code>\n"
+        "<b>SHA-1 Hash: </b> <code>{sha1}</code>\n\n"
+
+        "<b>🔍 Detection Summary <u>(Summary Across Various Antiviruses):</u></b>\n"
+        "- Malicious: {malicious}\n"
+        "- Suspicious: {suspicious}\n"
+        "- Harmless: {harmless}\n"
+        "- Undetected: {undetected}\n"
+        "- Timeout: {timeout}\n\n"
+
+        '<a href="https://www.virustotal.com/gui/file/{sha256}/detection">🦠 View Full Report</a>'
+    )
+    
     try:
         attributes = report["data"]["attributes"]
         results = attributes["stats"]
@@ -55,6 +59,8 @@ async def analyze_report(report: dict, file_name: str):
             "status"        : attributes.get("status", "Unknown").capitalize(),
             "scan_date"     : pendulum.now("UTC").format("YYYY-MM-DD HH:mm:ss"),
             "sha256"        : file_info.get("sha256", "N/A"),
+            "sha1"          : file_info.get("sha1", "N/A"),
+            "md5"           : file_info.get("md5", "N/A"),
             "file_name"     : file_name,
             "malicious"     : results.get("malicious", 0),
             "suspicious"    : results.get("suspicious", 0),
@@ -109,25 +115,22 @@ async def handle_file(message: types.Message, state: FSMContext):
 
             response = await check_file(absolute_file_path)
             
-            if response[0].startswith("ERROR_FILE_TYPE_NOT_SUPPORTED"):
-                response_msg = response = (
-                    "<b>Unsupported file type.</b>\n\n"
-                    "<b>Allowed file types include:</b>\n"
-                    "<b>Executables & Binaries:</b> .exe, .dll, .msi, .sys, .scr, .com, .bat, ELF, Mach-O\n"
-                    "<b>Documents:</b> .doc, .docx, .xls, .xlsx, .ppt, .pptx, .pdf, .rtf, .txt, .odt\n"
-                    "<b>Archives:</b> .zip, .rar, .7z, .tar, .gz, .bz2\n"
-                    "<b>Media:</b> .jpg, .png, .gif, .bmp, .ico, .mp3, .mp4, .avi, .mkv\n"
-                    "<b>Scripts and Code:</b> .js, .vbs, .ps1, .py, .sh, .java, .class, .jar\n"
-                    "<b>Other:</b> .apk, .iso, .img, .bin, .hex, .ps, .lnk\n\n"
-                    "Please upload a <b>supported</b> file format."
-                )
-
-                await message.reply(response_msg)
-
+            if "error" in response:
+                if response["error"] == "ERROR_FILE_TYPE_NOT_SUPPORTED":
+                    file_type = response["file_type"]
+                    response_msg = (
+                        f"Sorry, we don't support <b>{file_type}</b> file types at the moment.\n\n"
+                        "<u><b>Accepted file types include</b></u>\n"
+                        "<code>"
+                        f"{", ".join(ACCEPTED_FILE_TYPES)}"
+                        "</code>\n\n"
+                        "Please upload a <b>supported</b> file format."
+                    )
+                    await message.reply(response_msg)
+                    
             else:
-                report, _ = await analyze_report(response, file_name = document.file_name)
-                
-                await message.reply(report)    
+                report, _ = await analyze_report(response, file_name=document.file_name)
+                await message.reply(report)
             
             await message.bot.delete_message(chat_id = message.chat.id, message_id=file_recieved_msg.message_id)
 
@@ -138,7 +141,7 @@ async def handle_file(message: types.Message, state: FSMContext):
             print("Connection problem")
 
         except Exception as e:
-            print(e)
+            print(f"Unknown Error: {e}")
 
         absolute_file_path.unlink(missing_ok=True)
     
