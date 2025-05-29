@@ -124,7 +124,7 @@ async def get_scan_report(analysis_id: int, max_retries: int = 20, delay: int = 
                     print(f"[Info] Attempt {attempt + 1}/{max_retries} - Status: {status}")
                     await asyncio.sleep(delay)
 
-            return ("ERROR_FAILED_TO_RESPOND_ON_TIME", None)
+            return {"error": "ERROR_FAILED_TO_RESPOND_ON_TIME"}
 
         except KeyError:
             return ("KEY_ERROR_MISSING_DATA_ID", None)
