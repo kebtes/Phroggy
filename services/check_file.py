@@ -132,7 +132,7 @@ async def get_scan_report(analysis_id: int, max_retries: int = 20, delay: int = 
         except aiohttp.ClientError as e:
             return {"error": "CLIENT_ERROR", "data": str(e)}
     
-async def get_result_by_sha256(sha256: int):
+async def get_result_by_sha256(sha256: str):
     url = f"https://www.virustotal.com/api/v3/files/{sha256}"
     headers = {'x-apikey': VIRUS_TOTAL_API_KEY}
 
@@ -144,9 +144,10 @@ async def get_result_by_sha256(sha256: int):
 
                 error = result.get("error")
                 if isinstance(error, dict) and error.get("code") == "NotFoundError":
-                    return {"error", "NOT_FOUND"}
+                    return {"error": "NOT_FOUND"}
                     
                 return result
         
-        except aiohttp.ClientError() as e:
+        except aiohttp.ClientError as e:
             return {"error": "CLIENT_ERROR", "data": str(e)}
+        
