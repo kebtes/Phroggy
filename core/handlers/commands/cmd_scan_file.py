@@ -13,6 +13,8 @@ from services.check_file import check_file
 from core.handlers.commands import router
 from services.check_file import ACCEPTED_FILE_TYPES
 
+from services.check_file import scanner
+
 current_prompts = []
 
 FILE_SIZE_LIMIT = 20 * 10**6
@@ -113,8 +115,9 @@ async def handle_file(message: types.Message, state: FSMContext):
 
             file_recieved_msg = await message.answer("File recieved. Scanning...")
 
-            response = await check_file(absolute_file_path)
-            
+            response = await scanner(absolute_file_path)
+            # response = await check_file(absolute_file_path)
+
             if "error" in response:
                 error = response["error"]
                 if error == "ERROR_FILE_TYPE_NOT_SUPPORTED":
