@@ -136,6 +136,13 @@ async def handle_file(message: types.Message, state: FSMContext):
                     )
 
                     await message.reply(response_msg)
+
+                elif error == "ERROR_FAILED_TO_RESPOND_ON_TIME":
+                    response_msg = (
+                        "Looks like the servers are a bit busy right now. Try again in a moment!"
+                    )
+
+                    await message.reply(response_msg)
                     
             else:
                 report, _ = await analyze_report(response, file_name=document.file_name)
