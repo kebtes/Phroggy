@@ -2,6 +2,7 @@ from pathlib import Path
 import asyncio
 import aiohttp
 import aiofiles
+import threading
 
 from utils.hash_calc import calc_sha256
 from utils.file_protection import password_protected
@@ -31,6 +32,76 @@ ACCEPTED_FILE_TYPES = [
     # Other
     ".apk", ".iso", ".img", ".bin", ".hex", ".ps", ".lnk"
 ]
+
+MAX_REQ_PER_MIN = 4
+
+class RateLimitedChecker:
+    """
+    RateLimitedChecker is a utility that enforces a rate limit on asynchronous tasks, 
+    such as API requests. It ensures that no more than MAX_REQ_PER_MIN tasks are 
+    processed in a given 60-second interval.
+
+    Tasks are enqueued via `enqueue_task(file_path)` and processed in the background 
+    by a worker loop. If the rate limit is reached, the worker waits until the limit 
+    is reset before continuing. A separate thread resets the request counter every 60 seconds.
+    """
+    def __init__(self):
+        self.max_requests = MAX_REQ_PER_MIN
+        self.requests_left = self.max_requests
+        self.queue = asyncio.Queue()
+        self.interval = 60
+        self.lock = threading.Lock()
+        self.worker_running = False
+
+        threading.Thread(target=self._start_reset_loop, daemon=True).start()
+
+    async def __call__(self, file_path: str):
+        return await self.enqueue_task(file_path)
+    
+    def _start_reset_loop(self):
+        """Background thread that resets the request counter every minute."""
+        while True:
+            threading.Event().wait(self.interval)
+            with self.lock:
+                self.requests_left = self.max_requests
+            
+    async def enqueue_task(self, file_path: str):
+        future = asyncio.get_event_loop().create_future()
+        await self.queue.put((file_path, future))
+        await self.start_worker()
+        return await future
+
+    async def process_queue(self):
+        while True:
+            if self.queue.empty():
+                await asyncio.sleep(0.1)
+                continue
+
+            with self.lock:
+                if self.requests_left > 0:
+                    self.requests_left -= 1
+                else:
+                    await asyncio.sleep(1)
+                    continue
+
+            file_path, future = await self.queue.get()
+            asyncio.create_task(self._run_scan(file_path, future))
+
+    async def start_worker(self):
+        if self.worker_running:
+            return
+        
+        asyncio.create_task(self.process_queue())
+        self.worker_running = True
+    
+    async def _run_scan(self, file_path: str, future):
+        try:
+            result = await check_file(file_path)
+            future.set_result(result)
+        except Exception as e:
+            future.set_exception(e)
+
+scanner = RateLimitedChecker()
 
 async def check_file(file_path: str):
     """
