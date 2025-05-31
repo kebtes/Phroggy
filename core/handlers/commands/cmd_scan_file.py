@@ -126,7 +126,7 @@ async def handle_file(message: types.Message, state: FSMContext):
                         f"Sorry, we don't support <b>{file_type}</b> file types at the moment.\n\n"
                         "<u><b>Accepted file types include</b></u>\n"
                         "<code>"
-                        f"{", ".join(ACCEPTED_FILE_TYPES)}"
+                        f"{', '.join(ACCEPTED_FILE_TYPES)}"
                         "</code>\n\n"
                         "Please upload a <b>supported</b> file format."
                     )
