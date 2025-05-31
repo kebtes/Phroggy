@@ -165,3 +165,7 @@ async def handle_file(message: types.Message, state: FSMContext):
         absolute_file_path.unlink(missing_ok=True)
     
     await state.clear()
+
+@router.message(ScanFileStates.waiting_for_file)
+async def file_not_sent(message: types.Message):
+    current_prompts.append(await message.answer("Please send a valid file."))
