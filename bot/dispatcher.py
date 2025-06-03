@@ -1,5 +1,9 @@
 from aiogram import Dispatcher
-from core.handlers.commands import router
+from core.handlers import commands 
+from core.handlers import callbacks
 
 def register_handlers(dp: Dispatcher):
-    dp.include_router(router)
+    dp.include_routers(
+        commands.router,
+        callbacks.router
+    )
