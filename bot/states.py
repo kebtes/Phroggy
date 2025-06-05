@@ -5,3 +5,12 @@ class ScanFileStates(StatesGroup):
 
 class ScanURLStates(StatesGroup):
     waiting_for_url = State()
+
+class AddToGroupStates(StatesGroup):
+    waiting_for_id = State()
+
+class MyGroupStates(StatesGroup):
+    group_listing = State()
+    waiting_for_group_choice = State()
+    waiting_for_actions = State()
+    waiting_approval_group_deletion = State()
