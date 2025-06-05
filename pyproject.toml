@@ -52,3 +52,6 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["bot*", "core*", "config*", "services*", "utils*"]
+
+[tool.poetry.group.dev.dependencies]
+pip-tools = "^7.4.1"
