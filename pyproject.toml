@@ -42,8 +42,7 @@ dependencies = [
     "unshortenit==0.4.0",
     "urllib3==2.4.0",
     "yarl==1.20.0",
-    "tensorflow==2.19.0",
-    "pandas==2.2.3",
+    "pandas==2.2.3"
 ]
 
 [build-system]
