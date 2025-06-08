@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator, HttpUrl, Field, UUID4
+from pydantic import BaseModel, field_validator, HttpUrl, Field
 from typing import List, Literal, Optional
 from datetime import datetime, timezone
 from services.check_file import ACCEPTED_FILE_TYPES

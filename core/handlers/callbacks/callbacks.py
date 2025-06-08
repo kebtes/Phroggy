@@ -38,7 +38,7 @@ async def handle_link_group_callback(callback : types.CallbackQuery, state: FSMC
         buttons = [
             ["Remove", f"remove:group:{group_id}"],
             # ["Change Admin", f"change:admin:{group_id}"],
-            ["Back", f"go_back"]
+            ["Back", "go_back"]
         ]
 
         reply_markup = create(

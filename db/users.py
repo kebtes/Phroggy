@@ -49,3 +49,15 @@ async def remove_group(user_id: int, group_id: int):
 
     except Exception as e:
         print(e)
+
+async def add_group(user_id: int, group_id: int):
+    try:
+        users_collection.update_one(
+            {"user_id": user_id},
+            {"$push": {"groups": group_id}}
+        )
+    
+        return True
+    
+    except Exception as e:
+        print(e)

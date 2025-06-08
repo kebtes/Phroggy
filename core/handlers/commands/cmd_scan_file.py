@@ -9,7 +9,6 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
 from bot.states import ScanFileStates
-from services.check_file import check_file
 from core.handlers.commands import router
 from services.check_file import ACCEPTED_FILE_TYPES
 

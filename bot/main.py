@@ -8,20 +8,18 @@ from config import BOT_TOKEN
 from bot.dispatcher import register_handlers
 from bot.set_bot_commands import set_bot_commands
 from bot.storage import storage
-from core.handlers.commands import (
-    cmd_scan_file,
-    cmd_scan_url,
-    cmd_start,
-    cmd_link_group,
-    cmd_my_groups
-)
-from core.handlers.commands.group_commands import (
-    cmd_id,
-)
-
 from db import mongo
 
-from core.handlers.callbacks import callbacks
+# Command Handlers (side-effect imports for registration)
+import core.handlers.commands.cmd_scan_file  # noqa: F401
+import core.handlers.commands.cmd_scan_url  # noqa: F401
+import core.handlers.commands.cmd_start  # noqa: F401
+import core.handlers.commands.cmd_link_group  # noqa: F401
+import core.handlers.commands.cmd_my_groups  # noqa: F401
+import core.handlers.commands.group_commands.cmd_id  # noqa: F401
+
+# Callback Handlers
+import core.handlers.callbacks.callbacks  # noqa: F401
 
 timeout = ClientTimeout(total=60)
 

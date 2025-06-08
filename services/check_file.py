@@ -123,7 +123,7 @@ async def check_file(file_path: str):
                 if password_protected(file_extension):
                     return {"error": "ERROR_PASSWORD_PROTECTED", "file_type": file_extension}
             
-            except ValueError as e:
+            except ValueError:
                 pass
         
         # Check if a scan for the file already exists by sending a GET request using its SHA-256 hash

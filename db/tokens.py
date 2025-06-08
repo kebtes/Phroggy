@@ -1,8 +1,7 @@
-from typing import Optional, List
 from db.mongo import tokens_collection
 from db import schemas
 from pydantic import ValidationError,UUID4
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 
 async def fetch_user_from_token(token: UUID4):
     try:
