@@ -19,8 +19,7 @@ from core.handlers.commands import router
 from core.keyboards import create
 from db import users, groups
 
-@router.message(Command("my_groups"))
-@router.callback_query(MyGroupStates.group_listing)
+@router.message(Command("my_groups"))    
 async def list_groups(message: types.Message, state: FSMContext):
     user_id = message.chat.id
     user_groups = await users.get_groups(user_id) 
@@ -44,7 +43,7 @@ async def list_groups(message: types.Message, state: FSMContext):
             "Tap on any group to either unlink it or update its admin settings."
         )
 
-        await message.reply(response_msg, reply_markup=reply_markup)
+        await message.answer(response_msg, reply_markup=reply_markup)
         await state.set_state(MyGroupStates.waiting_for_group_choice)
     
     else:
@@ -53,4 +52,4 @@ async def list_groups(message: types.Message, state: FSMContext):
             "Use /link_group to get started."
         )
 
-        await message.reply(response_msg)
+        await message.asnwer(response_msg)

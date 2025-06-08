@@ -5,6 +5,7 @@ from core.handlers.callbacks import router
 from db import groups, users
 from core.keyboards import create
 from bot.states import MyGroupStates
+from core.handlers.commands import cmd_my_groups
 
 @router.callback_query(MyGroupStates.waiting_for_group_choice)
 async def handle_link_group_callback(callback : types.CallbackQuery, state: FSMContext):
@@ -36,7 +37,7 @@ async def handle_link_group_callback(callback : types.CallbackQuery, state: FSMC
 
         buttons = [
             ["Remove", f"remove:group:{group_id}"],
-            ["Change Admin", f"change:admin:{group_id}"],
+            # ["Change Admin", f"change:admin:{group_id}"],
             ["Back", f"go_back"]
         ]
 
@@ -61,8 +62,6 @@ async def handle_link_group_callback(callback : types.CallbackQuery, state: FSMC
 @router.callback_query(MyGroupStates.waiting_for_actions)
 async def handle_actions(callback: types.CallbackQuery, state: FSMContext):
     if callback.data.startswith("remove:group"):
-        # remove db logic here
-        # reprompt the user to just to be sure
         *_, group_id = callback.data.lower().split(":")
         group_id = int(group_id)
         user_id = callback.from_user.id
@@ -70,7 +69,6 @@ async def handle_actions(callback: types.CallbackQuery, state: FSMContext):
         await groups.remove(group_id)
         await users.remove_group(user_id, group_id)
 
-        # await callback.answer("Group Removed.")
         await callback.message.edit_text("Group removed successfully.")
         await state.clear()
 
@@ -79,7 +77,8 @@ async def handle_actions(callback: types.CallbackQuery, state: FSMContext):
         pass
 
     elif callback.data.startswith("go_back"):
-        
-        pass
+        await callback.bot.delete_message(callback.message.chat.id, callback.message.message_id)
+        await state.clear()
+        await cmd_my_groups.list_groups(callback.message, state)
 
     await state.set_state(MyGroupStates.waiting_approval_group_deletion)
