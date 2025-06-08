@@ -6,7 +6,7 @@ async def set_bot_commands(bot):
         BotCommand(command="scan_file", description="Upload a file to scan it for malware and threats."),
         BotCommand(command="scan_url", description="Submit a URL to check for phishing or malware."),
         BotCommand(command="link_group", description="Add the bot to a group chat."),
-        BotCommand(command="my_groups", description="Remove the bot from a group chat."),
+        BotCommand(command="my_groups", description="View all the groups you've linked."),
         BotCommand(command="help", description="List all commands and how to use them.")
     ]
 
