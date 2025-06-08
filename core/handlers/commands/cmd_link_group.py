@@ -2,16 +2,14 @@ from uuid import uuid4
 
 from aiogram import types
 from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
 
-from bot.states import AddToGroupStates
 from core.handlers.commands import router
 from db import users, groups, tokens
 
 current_prompts = []
 
 @router.message(Command("link_group"))
-async def waiting_for_id(message: types.Message, state: FSMContext):
+async def link_group(message: types.Message):
     uuid = str(uuid4())
 
     response_msg = (
@@ -19,16 +17,18 @@ async def waiting_for_id(message: types.Message, state: FSMContext):
         "<b> 1.</b> Add the bot to the group where you want it to operate.\n\n"
         "<b> 2.</b> Copy and paste the following command with the token inside that group chat. This will activate the bot’s ability to recognize the group.\n\n"
         f"<b>Command:</b> <code><b>/id {uuid}</b></code>\n\n"
-        "<b>TOKEN EXPIRES IN 10 MINS</b>"
+        "<b>Token Expires in 10 Minutes</b>"
     )
 
     user_id = message.chat.id
     await tokens.store_token(uuid, user_id)
     current_prompts.append(await message.reply(response_msg))
-    await state.set_state(AddToGroupStates.waiting_for_id)
+    
+# @router.message(AddToGroupStates.waiting_for_id)
+async def waiting_for_id(message: types.Message):
+    user_id = message.from_user.id
+    group_id = message.chat.id
 
-@router.message(AddToGroupStates.waiting_for_id)
-async def waiting_for_id(message: types.Message, group_id: int, user_id: int):
     # group details
     group_info = await message.bot.get_chat(group_id)
     group_name = group_info.title
@@ -86,3 +86,4 @@ async def waiting_for_id(message: types.Message, group_id: int, user_id: int):
 
     await message.bot.send_message(user_id, response_msg)
     current_prompts = []
+    

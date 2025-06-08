@@ -1,8 +1,6 @@
 from aiogram import types
 from aiogram.filters import Command, CommandObject
 
-from bot.states import AddToGroupStates
-from bot.storage import storage
 from core.handlers.commands import router
 from core.handlers.commands.cmd_link_group import waiting_for_id
 
@@ -38,29 +36,18 @@ async def id_group(message: types.Message, command: CommandObject):
         return
 
     try:
-        token = args[1]
-        group_id = int(args[0])
-        user = tokens.fetch_user_from_token(token)
+        token = args[0]
+        _user_id = await tokens.fetch_user_from_token(token)
 
         # no such token, expired or invalid
-        if not user:
+        if not _user_id:
             response_msg = (
                 "Invalid or expired token. Please go back the bot and try connecting again."
             )
             message.reply(response_msg)
             return
         
-        _user_id = user.get("user_id") # the user that invoked the /link_group command
-        
     except Exception as e:
         print(e)
 
-    await storage.set_state(
-        user_id,
-        AddToGroupStates.waiting_for_id
-    )
-
-    
-    await waiting_for_id(message, group_id, _user_id)
-    
-    
+    await waiting_for_id(message)
