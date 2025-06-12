@@ -51,6 +51,8 @@ async def waiting_for_id(message: types.Message):
     )
 
     if "error" in user:
+        error = user["error"]
+        
         if error == "VALIDATION_ERROR":
             await message.bot.send_message(user_id, "Error happend while trying to connect the bot to the group. Please try again later...")
             return
