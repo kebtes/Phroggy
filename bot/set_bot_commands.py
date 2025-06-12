@@ -17,7 +17,7 @@ async def set_bot_commands(bot):
     
     group_commands = [
         BotCommand(command="add_moderator", description="Give a user permission to use admin bot commands."),
-        BotCommand(command="auto_delete", description="Turn on automatic deletion of flagged messages."),
+        BotCommand(command="auto_delete", description="Automatic deletion of flagged messages."),
         BotCommand(command="blacklist_keyword", description="Block certain keywords in messages."),
         BotCommand(command="blaclist", description="Block a user from sending links or files."),
         BotCommand(command="hisotry", description="Show a log of flagged messages from the past week."),
