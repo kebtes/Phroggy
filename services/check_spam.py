@@ -1,3 +1,7 @@
+import os
+# suppress INFO logs including oneDNN info
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  
+
 import asyncio
 import aiofiles
 from tensorflow.keras import Model
@@ -7,7 +11,6 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from typing import List
 import pickle
 
-THRESHOLD = 0.65
 MAX_SEQUENCE_LENGTH = 100
 MODEL_PATH = r"spam_model\outputs\SpamDetectorModel.keras"
 TOKENIZER_PATH = r"spam_model\outputs\tokenizer.pickle"
@@ -45,13 +48,13 @@ async def preprocess(text: List[str]):
 
     return padded
 
-async def spam(text: str) -> List[str]:
+async def spam(text: str, threshold: int = 0.65) -> bool:
     """
     Predict whether the given text is spam or not.
     """
     # preprocess text
     preprocessed = await preprocess([text])
-    prediction = model.predict(preprocessed)
-    return prediction >= THRESHOLD
+    prediction = model.predict(preprocessed, verbose=0)
+    return bool(prediction[0][0] >= threshold)
 
 asyncio.run(load())
