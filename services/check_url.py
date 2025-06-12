@@ -13,7 +13,7 @@ THREAT_TYPES = [
     "THREAT_TYPE_UNSPECIFIED"
 ]
 
-async def check_url(text: str):
+async def check_url(text: str, skip: list = []):
     try:
         links = await extract_links(text)
 
@@ -24,6 +24,9 @@ async def check_url(text: str):
         any_threat = False
 
         for link in links:
+            if link in skip:
+                continue
+            
             response_data = await send_url_for_check(link)
             threat_types = await extract_threat_types(response_data)
 
