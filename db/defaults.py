@@ -3,7 +3,6 @@ DEFAULT_GROUP_SETTINGS = {
     "blacklist": [],
     "moderators": [],
     "spam_sensitivity": "moderate",
-    "virus_sensitivity": "moderate",
     "blacklist_keywords": [],
     "auto_delete": True,
     "notify_admins": True,
