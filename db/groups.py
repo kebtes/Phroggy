@@ -53,4 +53,37 @@ async def remove(group_id: int):
     
     except Exception as e:
         print(e)
-        
+
+async def is_admin(group_id: int, user_id: int):
+    """Assumes the gorup already exists"""
+    try:
+        group = await group_info(group_id)
+        admin = group.get("admin")
+        return user_id == admin
+    except Exception:
+        # TODO add a logger here
+        pass
+
+async def is_moderator(group_id: int, user_name: str):
+    """Assumes the gorup already exists"""
+    try:
+        group = await group_info(group_id)
+        moderators = set(group.get("moderators"))
+        return user_name in moderators
+    except Exception:
+        # TODO add a logger here
+        pass
+
+async def update_preference(group_id: int, **kwargs):
+    """
+    Updates group preferences falling under the settings part
+    """
+    try:
+        if kwargs.get("auto_delete", False):
+            await groups_collection.update_one(
+                {}
+            )
+            
+    
+    except Exception:
+        pass
