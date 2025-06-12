@@ -43,7 +43,6 @@ class GroupSettings(BaseModel):
 
     # detection settings
     spam_sensitivity: Literal["low", "moderate", "high"]
-    virus_sensitivity: Literal["low", "moderate", "high"]
     blacklist_keywords: List[str]
     auto_delete: bool
     notify_admins: bool
