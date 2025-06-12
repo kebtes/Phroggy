@@ -17,6 +17,7 @@ import core.handlers.commands.cmd_start  # noqa: F401
 import core.handlers.commands.cmd_link_group  # noqa: F401
 import core.handlers.commands.cmd_my_groups  # noqa: F401
 import core.handlers.commands.group_commands.cmd_id  # noqa: F401
+import core.handlers.message_listner  # noqa: F401
 
 # Callback Handlers
 import core.handlers.callbacks.callbacks  # noqa: F401
@@ -36,7 +37,6 @@ async def main():
 
     # db logics
     await mongo.init()
-
 
 if __name__ == '__main__':
     asyncio.run(main())
