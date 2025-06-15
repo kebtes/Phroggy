@@ -1,27 +1,29 @@
-from pydantic import BaseModel, field_validator, HttpUrl, Field
-from typing import List, Literal, Optional
-from datetime import datetime, timezone
-from services.check_file import ACCEPTED_FILE_TYPES
 import pathlib
+from datetime import datetime, timezone
+from typing import List, Literal, Optional
+
+from pydantic import BaseModel, Field, HttpUrl, field_validator
+
+from services.check_file import ACCEPTED_FILE_TYPES
 
 
-# * CUSTOM VALIDATORS   
+# * CUSTOM VALIDATORS
 class FileModel(BaseModel):
     """
     Represents a file with validation on its extension.
     Only accepts filenames with extensions listed in ACCEPTED_FILE_TYPES
     """
     filename: str
-    
+
     @field_validator("filename")
     @classmethod
     def validate_filetype(cls, v: str):
         ext = pathlib.Path(v).suffix.lower()
         if ext not in ACCEPTED_FILE_TYPES:
             raise ValueError(f"File type {ext}, not accepted.")
-        
+
         return v
-    
+
 
 # * SCHEMAS
 class GroupLog(BaseModel):
@@ -30,7 +32,8 @@ class GroupLog(BaseModel):
     """
     timestamp: datetime
     action: str
-    details: Optional[str]
+    user: str
+    message: str
 
 class GroupSettings(BaseModel):
     """
@@ -39,14 +42,13 @@ class GroupSettings(BaseModel):
     # user access controls
     whitelist: List[str] # list of usernames
     blacklist: List[str]
-    moderators: List[str] 
+    moderators: List[str]
 
     # detection settings
     spam_sensitivity: Literal["low", "moderate", "high"]
     blacklist_keywords: List[str]
     auto_delete: bool
-    notify_admins: bool
-    notify_users: bool
+    notify: bool
 
     # scan behavior & scheduling
     # scan_interval: int = Field(..., description="Scan interval in seconds.")
@@ -63,7 +65,7 @@ class UserSchema(BaseModel):
     username: str
     user_id: int
     groups: List[int] # group chat id
-    
+
 class GroupSchema(BaseModel):
     """
     Represents a group chat.
