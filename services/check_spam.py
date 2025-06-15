@@ -1,15 +1,18 @@
 import os
-# suppress INFO logs including oneDNN info
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  
+
+# suppress INFO logs
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 import asyncio
+import pickle
+from typing import List
+
 import aiofiles
 from tensorflow.keras import Model
-from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from typing import List
-import pickle
+from tensorflow.keras.preprocessing.text import Tokenizer
 
 MAX_SEQUENCE_LENGTH = 100
 MODEL_PATH = r"spam_model\outputs\SpamDetectorModel.keras"
@@ -33,7 +36,7 @@ async def load():
     async with aiofiles.open(TOKENIZER_PATH, "rb") as f:
         content = await f.read()
         tokenizer = pickle.loads(content)
-    
+
 async def preprocess(text: List[str]):
     """
     Preprocess a list of text strings into padded sequences suitable for model input.
