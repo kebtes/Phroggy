@@ -56,3 +56,13 @@ include = ["bot*", "core*", "config*", "services*", "utils*"]
 
 [tool.poetry.group.dev.dependencies]
 pip-tools = "^7.4.1"
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+src = ["."]
+select = ["E", "F", "I", "W", "C"]  
+fix = true
+
+[tool.ruff.format]
+quote-style = "double"
