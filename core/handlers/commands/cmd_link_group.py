@@ -4,7 +4,7 @@ from aiogram import types
 from aiogram.filters import Command
 
 from core.handlers.commands import router
-from db import users, groups, tokens
+from db import groups, tokens, users
 
 current_prompts = []
 
@@ -14,7 +14,7 @@ async def link_group(message: types.Message):
 
     response_msg = (
         "<b>To add this bot to a group, follow the following steps.</b>\n\n"
-        "<b> 1.</b> Add the bot to the group where you want it to operate.\n\n"
+        "<b> 1.</b> <a href = 'https://t.me/agentivy_bot?startgroup&admin=delete_messages+restrict_members+pin_messages'>Add</a> the bot to the group where you want it to operate.\n\n"
         "<b> 2.</b> Copy and paste the following command with the token inside that group chat. This will activate the bot’s ability to recognize the group.\n\n"
         f"<b>Command:</b> <code><b>/id {uuid}</b></code>\n\n"
         "<b>Token Expires in 10 Minutes</b>"
@@ -23,7 +23,7 @@ async def link_group(message: types.Message):
     user_id = message.chat.id
     await tokens.store_token(uuid, user_id)
     current_prompts.append(await message.reply(response_msg))
-    
+
 # @router.message(AddToGroupStates.waiting_for_id)
 async def waiting_for_id(message: types.Message):
     user_id = message.from_user.id
@@ -41,7 +41,7 @@ async def waiting_for_id(message: types.Message):
     user_name = message.from_user.username
 
     # ! TODO : check if the group is a super group
-    # ! some funcitonalities might not work for it 
+    # ! some funcitonalities might not work for it
 
     # create the user
     user = await users.create_user(
@@ -52,11 +52,11 @@ async def waiting_for_id(message: types.Message):
 
     if "error" in user:
         error = user["error"]
-        
+
         if error == "VALIDATION_ERROR":
             await message.bot.send_message(user_id, "Error happend while trying to connect the bot to the group. Please try again later...")
             return
-        
+
     # create the group
     group = await groups.create_group(
         group_id=group_id,
@@ -70,7 +70,7 @@ async def waiting_for_id(message: types.Message):
         if error == "VALIDATION_ERROR":
             await message.bot.send_message(user_id, "Error happend while trying to connect the bot to the group. Please try again later...")
             return
-            
+
     global current_prompts
     for msg in current_prompts:
         await message.bot.delete_message(chat_id=user_id, message_id=msg.message_id)
@@ -88,4 +88,3 @@ async def waiting_for_id(message: types.Message):
 
     await message.bot.send_message(user_id, response_msg)
     current_prompts = []
-    
