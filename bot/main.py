@@ -6,10 +6,11 @@ from aiohttp import ClientTimeout
 
 # Callback Handlers
 import core.handlers.callbacks.callbacks  # noqa: F401
-import core.handlers.commands.cmd_link_group  # noqa: F401
-import core.handlers.commands.cmd_my_groups  # noqa: F401
 
 # Command Handlers (side-effect imports for registration)
+import core.handlers.commands.cmd_help  # noqa: F401
+import core.handlers.commands.cmd_link_group  # noqa: F401
+import core.handlers.commands.cmd_my_groups  # noqa: F401
 import core.handlers.commands.cmd_scan_file  # noqa: F401
 import core.handlers.commands.cmd_scan_url  # noqa: F401
 import core.handlers.commands.cmd_start  # noqa: F401
