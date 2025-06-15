@@ -1,7 +1,9 @@
-from aiogram.types import Document, Message
-from services import check_file, check_spam, check_url
-from db import groups
 from pathlib import Path
+
+from aiogram.types import Document, Message
+
+from db import groups
+from services import check_file, check_spam, check_url
 
 sensitivity_thresholds = {
     "low": 0.5,
@@ -23,10 +25,10 @@ async def check(text: str, document: Document, group_id: int, message: Message):
 
     # fetch group settings
     group_info = await groups.group_info(group_id)
-    
+
     # * LINKS
     try:
-        skip = set(group_info.get("skip_links", [])) 
+        skip = set(group_info.get("skip_links", []))
         resp = await check_url.check_url(text, skip)
         if resp:
             threat_found = resp[0]
@@ -34,7 +36,7 @@ async def check(text: str, document: Document, group_id: int, message: Message):
                 output["link"] = resp[1]
             else:
                 output["link"] = False
-    
+
     except Exception:
         # TOOD add a logger here
         pass
@@ -42,7 +44,7 @@ async def check(text: str, document: Document, group_id: int, message: Message):
     # * FILES
     try:
         skip_files = set(group_info.get("skip_urls", []))
-        
+
         # check if its skippable
         mime_type = document.mime_type
         _, ext = mime_type.split("/")
@@ -78,7 +80,7 @@ async def check(text: str, document: Document, group_id: int, message: Message):
                 suspicous = results.get("suspicious", 0)
 
                 output["file"] = True if malicious > 0 or suspicous > 0 else False
-    
+
     except Exception:
         # logg this shit
         pass
@@ -87,12 +89,12 @@ async def check(text: str, document: Document, group_id: int, message: Message):
     try:
         spam_sensitivity = group_info.get("spam_sensitivity", "moderate")
         sensitivity = sensitivity_thresholds[spam_sensitivity]
-        
+
         is_spam = await check_spam.spam(text, sensitivity)
         output["spam"] = is_spam
 
     except Exception:
         # add a fckn logger here
         pass
-    
+
     return output
