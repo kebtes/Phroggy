@@ -3,9 +3,8 @@ from aiogram.filters import Command, CommandObject
 
 from core.handlers.commands import router
 from core.handlers.commands.cmd_link_group import waiting_for_id
+from db import groups, tokens
 
-from db import groups
-from db import tokens
 
 @router.message(Command("id"))
 async def id_group(message: types.Message, command: CommandObject):
@@ -22,12 +21,12 @@ async def id_group(message: types.Message, command: CommandObject):
 
         await message.reply(response_msg)
         return
-    
+
     # check if args is empty
     if not command.args:
         await message.reply("Please provide an ID.")
         return
-    
+
     # check if the arg format is correct
     args = command.args.strip().split()
 
@@ -46,7 +45,7 @@ async def id_group(message: types.Message, command: CommandObject):
             )
             message.reply(response_msg)
             return
-        
+
     except Exception as e:
         print(e)
 
