@@ -39,6 +39,7 @@ async def handle_link_group_callback(callback : types.CallbackQuery, state: FSMC
         buttons = [
             ["Remove", f"remove:group:{group_id}"],
             # ["Change Admin", f"change:admin:{group_id}"],
+            ["Logs", f"logs:{group_id}"],
             ["Back", "go_back"]
         ]
 
@@ -82,7 +83,22 @@ async def handle_actions(callback: types.CallbackQuery, state: FSMContext):
         await state.clear()
         await cmd_my_groups.list_groups(callback.message, state)
 
-    await state.set_state(MyGroupStates.waiting_approval_group_deletion)
+    elif callback.data.startswith("logs"):
+        _, group_id = callback.data.lower().split(":")
+        group_id = int(group_id)
+        logs = await groups.get_log(group_id=group_id)
+
+        if logs:
+            response_msg = "Only the last 5 logs will be shown here. Options to get more logs will be available inside of the bot.\n\n"
+            response_msg += "".join(logs[:5])
+
+            await send_group_logs(callback, logs, group_id) # send the log document
+            await callback.answer()
+
+        else:
+            response_msg = "No logs so far!"
+
+    # await state.set_state(MyGroupStates.waiting_approval_group_deletion)
 
 @router.callback_query(HelpStates.main)
 async def handle_help(callback: types.CallbackQuery, state: FSMContext):
@@ -249,3 +265,26 @@ async def send_group_settings(callback: types.CallbackQuery, state: FSMContext):
     )
 
     await state.set_state(HelpStates.group_settings)
+
+async def send_group_logs(callback: types.CallbackQuery, logs: list[str], group_id: int):
+    import os
+
+    import aiofiles
+
+    user_id = callback.message.chat.id
+    bot = callback.bot
+
+    file_path = f"logs_{group_id}.txt"
+
+    try:
+        async with aiofiles.open(file_path, mode="w") as f:
+            await f.write("\n".join(logs))
+
+        await bot.send_document(chat_id=user_id, document=types.FSInputFile(file_path))
+
+    except Exception:
+        pass
+
+    finally:
+        if os.path.exists(file_path):
+            os.remove(file_path)
