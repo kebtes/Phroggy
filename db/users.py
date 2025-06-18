@@ -50,8 +50,16 @@ async def remove_group(user_id: int, group_id: int):
     except Exception as e:
         print(e)
 
-async def add_group(user_id: int, group_id: int):
+async def add_group(user_name: str, user_id: int, group_id: int):
     try:
+        user_exists = await user_exist(user_id)
+        if not user_exist:
+            await create_user(
+                username=user_name,
+                user_id=user_id,
+                groups=[group_id]
+            )
+
         users_collection.update_one(
             {"user_id": user_id},
             {"$push": {"groups": group_id}}
