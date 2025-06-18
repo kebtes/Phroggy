@@ -44,7 +44,7 @@ async def waiting_for_id(message: types.Message):
     # ! some funcitonalities might not work for it
 
     # create the user
-    user = await users.create_user(
+    user = await users.add_group(
         username=user_name,
         user_id=user_id,
         groups=[group_id]
