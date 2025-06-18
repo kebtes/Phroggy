@@ -17,13 +17,14 @@ from aiogram.fsm.context import FSMContext
 from bot.states import MyGroupStates
 from core.handlers.commands import router
 from core.keyboards import create
-from db import users, groups
+from db import groups, users
 
-@router.message(Command("my_groups"))    
+
+@router.message(Command("my_groups"))
 async def list_groups(message: types.Message, state: FSMContext):
     user_id = message.chat.id
-    user_groups = await users.get_groups(user_id) 
-    
+    user_groups = await users.get_groups(user_id)
+
     if user_groups:
         buttons = []
         for group_id in user_groups:
@@ -45,11 +46,11 @@ async def list_groups(message: types.Message, state: FSMContext):
 
         await message.answer(response_msg, reply_markup=reply_markup)
         await state.set_state(MyGroupStates.waiting_for_group_choice)
-    
+
     else:
         response_msg = (
             "Looks like you haven't added me to any groups yet!\n\n"
             "Use /link_group to get started."
         )
 
-        await message.asnwer(response_msg)
+        await message.reply(response_msg)
