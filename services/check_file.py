@@ -1,12 +1,15 @@
-from pathlib import Path
 import asyncio
-import aiohttp
-import aiofiles
 import threading
+from pathlib import Path
 
-from utils.hash_calc import calc_sha256
-from utils.file_protection import password_protected
+import aiofiles
+import aiohttp
+
 from config.secrets import VIRUS_TOTAL_API_KEY
+from utils.file_protection import password_protected
+from utils.hash_calc import calc_sha256
+
+from loguru import logger
 
 CATEGORIES = ['malicious', 'suspicious']
 ACCEPTED_FILE_TYPES = [
@@ -57,14 +60,14 @@ class RateLimitedChecker:
 
     async def __call__(self, file_path: str):
         return await self.enqueue_task(file_path)
-    
+
     def _start_reset_loop(self):
         """Background thread that resets the request counter every minute."""
         while True:
             threading.Event().wait(self.interval)
             with self.lock:
                 self.requests_left = self.max_requests
-            
+
     async def enqueue_task(self, file_path: str):
         future = asyncio.get_event_loop().create_future()
         await self.queue.put((file_path, future))
@@ -90,10 +93,10 @@ class RateLimitedChecker:
     async def start_worker(self):
         if self.worker_running:
             return
-        
+
         asyncio.create_task(self.process_queue())
         self.worker_running = True
-    
+
     async def _run_scan(self, file_path: str, future):
         try:
             result = await check_file(file_path)
@@ -107,9 +110,9 @@ async def check_file(file_path: str):
     """
     Main entry point to scan a file and return a report and flag status.
     """
-    
+
     COMPRESSED_FILE_TYPES = [".zip", ".rar", ".7z", ".tar", ".gz", ".bz2"]
-    
+
     try:
 
         # check file type before moving forward
@@ -122,10 +125,10 @@ async def check_file(file_path: str):
             try:
                 if password_protected(file_extension):
                     return {"error": "ERROR_PASSWORD_PROTECTED", "file_type": file_extension}
-            
+
             except ValueError:
                 pass
-        
+
         # Check if a scan for the file already exists by sending a GET request using its SHA-256 hash
         sha256 = await calc_sha256(str(file_path))
         response = await get_result_by_sha256(sha256)
@@ -133,14 +136,14 @@ async def check_file(file_path: str):
         # if "error" in response and response["error"] == "NOT_FOUND":
         #     analysis_id = await send_file_for_scan(file_path)
         #     return await get_scan_report(analysis_id)
-        
+
         # return await get_result_by_sha256(sha256)
-    
+
         analysis_id = await send_file_for_scan(file_path)
         return await get_scan_report(analysis_id)
-    
+
     except Exception as e:
-        print(f"[Error] Scan failed: {e}")
+        logger.log(f"[Error] Scan failed: {e}")
         return None
 
 async def send_file_for_scan(file_path: str):
@@ -166,13 +169,13 @@ async def send_file_for_scan(file_path: str):
                     result = await resp.json()
                     return result["data"]["id"]
                     # return result
-    
+
     except aiohttp.ClientError as e:
         return ("CLIENT_ERROR", str(e))
-    
+
     except aiohttp.ContentTypeError:
         return ("JSON_ERROR_FAILED_TO_PARSE_ERROR")
-  
+
 
 async def get_scan_report(analysis_id: int, max_retries: int = 20, delay: int = 3) -> dict:
     """
@@ -191,18 +194,18 @@ async def get_scan_report(analysis_id: int, max_retries: int = 20, delay: int = 
                     status = result.get("data", {}).get("attributes", {}).get("status")
                     if status == "completed":
                         return result
-                    
-                    print(f"[Info] Attempt {attempt + 1}/{max_retries} - Status: {status}")
+
+                    # print(f"[Info] Attempt {attempt + 1}/{max_retries} - Status: {status}")
                     await asyncio.sleep(delay)
 
             return {"error": "ERROR_FAILED_TO_RESPOND_ON_TIME"}
 
         except KeyError:
             return ("KEY_ERROR_MISSING_DATA_ID", None)
-        
+
         except aiohttp.ClientError as e:
             return {"error": "CLIENT_ERROR", "data": str(e)}
-    
+
 async def get_result_by_sha256(sha256: str):
     url = f"https://www.virustotal.com/api/v3/files/{sha256}"
     headers = {'x-apikey': VIRUS_TOTAL_API_KEY}
@@ -216,9 +219,8 @@ async def get_result_by_sha256(sha256: str):
                 error = result.get("error")
                 if isinstance(error, dict) and error.get("code") == "NotFoundError":
                     return {"error": "NOT_FOUND"}
-                    
+
                 return result
-        
+
         except aiohttp.ClientError as e:
             return {"error": "CLIENT_ERROR", "data": str(e)}
-        
