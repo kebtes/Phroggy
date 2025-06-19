@@ -1,11 +1,10 @@
 from datetime import datetime, timezone
 
-from aiogram import Router, types
+from aiogram import types
 
+from core.handlers.listeners import router
 from db import groups
 from services.check import check
-
-router = Router()
 
 response_template_flagged = (
     "<b>⚠️ This message was flagged for suspicious content</b>\n\n"
