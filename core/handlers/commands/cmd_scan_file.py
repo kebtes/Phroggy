@@ -6,6 +6,7 @@ import pendulum
 from aiogram import F, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
+from loguru import logger
 
 from bot.states import ScanFileStates
 from core.handlers.commands import router
@@ -77,8 +78,7 @@ async def analyze_report(report: dict, file_name: str):
         return report_str, is_flagged
 
     except KeyError as e:
-        print(f"[Error] Missing key in report: {e}")
-        print("Full report:", report)
+        logger.exception(f"Missing key in report {e}")
         raise
 
 @router.message(Command("scan_file"))
@@ -150,13 +150,13 @@ async def handle_file(message: types.Message, state: FSMContext):
             await message.bot.delete_message(chat_id = message.chat.id, message_id=file_recieved_msg.message_id)
 
         except asyncio.TimeoutError:
-            print("Time out while downloading file")
+            logger.exception("Time out while downloading file")
 
         except aiohttp.ClientError:
-            print("Connection problem")
+            logger.exception("Connection problem")
 
         except Exception as e:
-            print(f"Unknown Error: {e}")
+            logger.exception(f"Unknown Error: {e}")
 
         absolute_file_path.unlink(missing_ok=True)
 

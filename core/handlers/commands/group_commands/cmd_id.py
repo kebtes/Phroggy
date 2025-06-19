@@ -1,5 +1,6 @@
 from aiogram import types
 from aiogram.filters import Command, CommandObject
+from loguru import logger
 
 from core.handlers.commands import router
 from core.handlers.commands.cmd_link_group import waiting_for_id
@@ -47,6 +48,6 @@ async def id_group(message: types.Message, command: CommandObject):
             return
 
     except Exception as e:
-        print(e)
+        logger.exception(e)
 
     await waiting_for_id(message)

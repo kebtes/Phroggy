@@ -1,5 +1,6 @@
 from aiogram import types
 from aiogram.filters import Command, CommandObject
+from loguru import logger
 
 from core.handlers.commands import router
 from db import groups
@@ -36,5 +37,4 @@ async def id_group(message: types.Message, command: CommandObject):
         await message.reply("Preference updated!")
 
     except Exception as e:
-        print(e)
-
+        logger.exception(e)
