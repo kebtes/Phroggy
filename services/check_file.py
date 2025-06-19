@@ -4,12 +4,12 @@ from pathlib import Path
 
 import aiofiles
 import aiohttp
+from loguru import logger
 
 from config.secrets import VIRUS_TOTAL_API_KEY
 from utils.file_protection import password_protected
-from utils.hash_calc import calc_sha256
 
-from loguru import logger
+# from utils.hash_calc import calc_sha256
 
 CATEGORIES = ['malicious', 'suspicious']
 ACCEPTED_FILE_TYPES = [
@@ -40,12 +40,12 @@ MAX_REQ_PER_MIN = 4
 
 class RateLimitedChecker:
     """
-    RateLimitedChecker is a utility that enforces a rate limit on asynchronous tasks, 
-    such as API requests. It ensures that no more than MAX_REQ_PER_MIN tasks are 
+    RateLimitedChecker is a utility that enforces a rate limit on asynchronous tasks,
+    such as API requests. It ensures that no more than MAX_REQ_PER_MIN tasks are
     processed in a given 60-second interval.
 
-    Tasks are enqueued via `enqueue_task(file_path)` and processed in the background 
-    by a worker loop. If the rate limit is reached, the worker waits until the limit 
+    Tasks are enqueued via `enqueue_task(file_path)` and processed in the background
+    by a worker loop. If the rate limit is reached, the worker waits until the limit
     is reset before continuing. A separate thread resets the request counter every 60 seconds.
     """
     def __init__(self):
@@ -130,8 +130,8 @@ async def check_file(file_path: str):
                 pass
 
         # Check if a scan for the file already exists by sending a GET request using its SHA-256 hash
-        sha256 = await calc_sha256(str(file_path))
-        response = await get_result_by_sha256(sha256)
+        # sha256 = await calc_sha256(str(file_path))
+        # response = await get_result_by_sha256(sha256)
 
         # if "error" in response and response["error"] == "NOT_FOUND":
         #     analysis_id = await send_file_for_scan(file_path)
@@ -161,7 +161,6 @@ async def send_file_for_scan(file_path: str):
                 data = aiohttp.FormData()
 
                 file_name = Path(file_path).name
-                # data.add_field("file", file_data, filename=file_path.split('/')[-1], content_type="application/octet-stream")
                 data.add_field("file", file_data, filename=file_name, content_type="application/octet-stream")
 
                 async with session.post(url, headers=headers, data=data) as resp:
