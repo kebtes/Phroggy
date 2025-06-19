@@ -1,4 +1,9 @@
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/b6b9394b-6ff2-4d3e-9782-fda1aeffdb7e" alt="phroggy_banner" />
+</p>
+
 # Phroggy
+
 **Your group’s low-key bodyguard — blocking spam, spotting malware, and checking suspicious files with just a forward.**
 
 Phroggy is an AI-powered Telegram bot designed to protect your group chats by blocking shady links, sketchy files, and spammy messages using a highly accurate pretrained model.
