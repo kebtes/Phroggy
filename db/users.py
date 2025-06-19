@@ -1,13 +1,17 @@
-from typing import Optional, List
-from db.mongo import users_collection
-from db import schemas
+from typing import List, Optional
+
+from loguru import logger
 from pydantic import ValidationError
+
+from db import schemas
+from db.mongo import users_collection
+
 
 async def user_exist(user_id: int):
     """Returns the user if it exists, else None"""
     try:
         user = await users_collection.find_one({"user_id": user_id})
-    
+
     except Exception as e:
         return {"error": "USER_LOOK_UP_FAILED", "data": e}
 
@@ -36,7 +40,7 @@ async def get_groups(user_id: int):
         return user.get("groups", []) if user else []
 
     except Exception as e:
-        print(e)
+        logger.exception(e)
 
 async def remove_group(user_id: int, group_id: int):
     try:
@@ -48,12 +52,12 @@ async def remove_group(user_id: int, group_id: int):
         return True
 
     except Exception as e:
-        print(e)
+        logger.exception(e)
 
 async def add_group(user_name: str, user_id: int, group_id: int):
     try:
         user_exists = await user_exist(user_id)
-        if not user_exist:
+        if not user_exists:
             await create_user(
                 username=user_name,
                 user_id=user_id,
@@ -64,8 +68,8 @@ async def add_group(user_name: str, user_id: int, group_id: int):
             {"user_id": user_id},
             {"$push": {"groups": group_id}}
         )
-    
+
         return True
-    
+
     except Exception as e:
-        print(e)
+        logger.exception(e)

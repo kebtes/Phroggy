@@ -6,7 +6,7 @@ from pydantic import ValidationError
 from db import defaults, schemas
 from db.mongo import groups_collection
 
-
+from loguru import logger
 async def group_exists(group_id: int):
     """Returns the group if it exists, else None"""
     try:
@@ -47,7 +47,7 @@ async def group_info(group_id: int):
         return group if group else []
 
     except Exception as e:
-        print(e)
+        logger.exception(e)
 
 async def remove(group_id: int):
     """Assumes the group already exists"""
@@ -56,7 +56,7 @@ async def remove(group_id: int):
         return groups
 
     except Exception as e:
-        print(e)
+        logger.exception(e)
 
 async def is_admin(group_id: int, user_id: int):
     """Assumes the gorup already exists"""
@@ -143,8 +143,8 @@ async def update(group_id: int, **kwargs):
                 {"$push": {"settings.skip_files": kwargs["skip_files"]}}
             )
 
-    except Exception:
-        pass
+    except Exception as e:
+        logger.exception(e)
 
 async def log(group_id: int, timestamp: datetime, action: str, user: str, message: str):
     MAX_LOG_SIZE = 50
@@ -168,7 +168,7 @@ async def log(group_id: int, timestamp: datetime, action: str, user: str, messag
         )
 
     except Exception as e:
-        print(e)
+        logger.exception(e)
 
 async def get_log(group_id: int, html_format: bool = True):
     # returns a formatted log in the form of a string
