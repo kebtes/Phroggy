@@ -43,7 +43,8 @@ dependencies = [
     "urllib3==2.4.0",
     "yarl==1.20.0",
     "pandas==2.2.3",
-    "motor==3.7.1"
+    "motor==3.7.1",
+    "loguru==0.7.3"
 ]
 
 [build-system]
@@ -58,7 +59,7 @@ include = ["bot*", "core*", "config*", "services*", "utils*"]
 pip-tools = "^7.4.1"
 
 [tool.ruff]
-line-length = 88
+line-length = 120
 target-version = "py311"
 src = ["."]
 select = ["E", "F", "I", "W", "C"]  
