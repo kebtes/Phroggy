@@ -1,18 +1,15 @@
-from pathlib import Path
 import asyncio
+from pathlib import Path
+
 import aiohttp
-
 import pendulum
-
-from aiogram import types, F
+from aiogram import F, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
 from bot.states import ScanFileStates
 from core.handlers.commands import router
-from services.check_file import ACCEPTED_FILE_TYPES
-
-from services.check_file import scanner
+from services.check_file import ACCEPTED_FILE_TYPES, scanner
 
 current_prompts = []
 
@@ -49,7 +46,7 @@ async def analyze_report(report: dict, file_name: str):
 
         '<a href="https://www.virustotal.com/gui/file/{sha256}/detection">🦠 View Full Report</a>'
     )
-    
+
     try:
         attributes = report["data"]["attributes"]
         results = attributes["stats"]
@@ -92,14 +89,14 @@ async def ask_for_file(message: types.Message, state: FSMContext):
 @router.message(ScanFileStates.waiting_for_file, F.document)
 async def handle_file(message: types.Message, state: FSMContext):
     document = message.document
-    
+
     # check file size before moving forward
     if document.file_size > FILE_SIZE_LIMIT:
         await message.reply("The file exceeds the Telegram bot upload limit.\nPlease send a file smaller than <b>20 MB.</b>")
-    
+
     else:
         file = await message.bot.get_file(document.file_id)
-        
+
         ROOT_DIR = Path(__file__).resolve().parent.parent.parent
         TEMP_DIR = ROOT_DIR / "temp"
         TEMP_DIR.mkdir(exist_ok=True)
@@ -130,7 +127,7 @@ async def handle_file(message: types.Message, state: FSMContext):
                         "Please upload a <b>supported</b> file format."
                     )
                     await message.reply(response_msg)
-                
+
                 elif error == "ERROR_PASSWORD_PROTECTED":
                     response_msg = (
                         "This file appears to be <b>password-protected</b> and cannot be processed automatically. "
@@ -145,11 +142,11 @@ async def handle_file(message: types.Message, state: FSMContext):
                     )
 
                     await message.reply(response_msg)
-                    
+
             else:
                 report, _ = await analyze_report(response, file_name=document.file_name)
                 await message.reply(report)
-            
+
             await message.bot.delete_message(chat_id = message.chat.id, message_id=file_recieved_msg.message_id)
 
         except asyncio.TimeoutError:
@@ -162,9 +159,9 @@ async def handle_file(message: types.Message, state: FSMContext):
             print(f"Unknown Error: {e}")
 
         absolute_file_path.unlink(missing_ok=True)
-    
+
     await state.clear()
 
-@router.message(ScanFileStates.waiting_for_file)
+@router.message(ScanFileStates.waiting_for_file, ~F.text.startswith("/"))
 async def file_not_sent(message: types.Message):
     current_prompts.append(await message.answer("Please send a valid file."))
