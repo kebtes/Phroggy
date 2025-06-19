@@ -19,6 +19,9 @@ jobs:
       VIRUS_TOTAL_API_KEY: ${{ secrets.VIRUS_TOTAL_API_KEY }}
       SAFE_BROWSING_API_KEY: ${{ secrets.SAFE_BROWSING_API_KEY }}
       MONGO_DB_CONNECTION_STRING: ${{ secrets.MONGO_DB_CONNECTION_STRING }}
+      BETTER_STACK_SOURCE_TOKEN: ${{ secrets.BETTER_STACK_SOURCE_TOKEN }}
+      BETTER_STACK_INGESTING_HOST: ${{ secrets.BETTER_STACK_INGESTING_HOST }}
+
 
     steps:
     - uses: actions/checkout@v4
