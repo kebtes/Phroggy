@@ -14,7 +14,7 @@ async def link_group(message: types.Message):
 
     response_msg = (
         "<b>To add this bot to a group, follow the following steps.</b>\n\n"
-        "<b> 1.</b> <a href = 'https://t.me/agentivy_bot?startgroup&admin=delete_messages+restrict_members+pin_messages'>Add</a> the bot to the group where you want it to operate.\n\n"
+        "<b> 1.</b> <a href = 'https://t.me/Phroggy_Bot?startgroup&admin=delete_messages+restrict_members+pin_messages'>Add</a> the bot to the group where you want it to operate.\n\n"
         "<b> 2.</b> Copy and paste the following command with the token inside that group chat. This will activate the bot’s ability to recognize the group.\n\n"
         f"<b>Command:</b> <code><b>/id {uuid}</b></code>\n\n"
         "<b>Token Expires in 10 Minutes</b>"
