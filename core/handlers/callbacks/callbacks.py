@@ -86,7 +86,7 @@ async def handle_actions(callback: types.CallbackQuery, state: FSMContext):
     elif callback.data.startswith("logs"):
         _, group_id = callback.data.lower().split(":")
         group_id = int(group_id)
-        logs = await groups.get_log(group_id=group_id)
+        logs = await groups.get_log(group_id=group_id, html_format=False)
 
         if logs:
             response_msg = "Only the last 5 logs will be shown here. Options to get more logs will be available inside of the bot.\n\n"

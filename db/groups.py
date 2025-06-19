@@ -170,7 +170,7 @@ async def log(group_id: int, timestamp: datetime, action: str, user: str, messag
     except Exception as e:
         print(e)
 
-async def get_log(group_id: int):
+async def get_log(group_id: int, html_format: bool = True):
     # returns a formatted log in the form of a string
 
     group = await group_info(group_id)
@@ -189,10 +189,16 @@ async def get_log(group_id: int):
         user = log["user"]
         message_text = log["message"]
 
-        formatted_text = (
-            f"• <b>{user} | {action} | <i>{formatted_timestamp}</i></b>\n"
-            f"<s>{message_text}</s>\n\n"
-        )
+        if html_format:
+            formatted_text = (
+                f"• <b>{user} | {action} | <i>{formatted_timestamp}</i></b>\n"
+                f"<s>{message_text}</s>\n\n"
+            )
+        else:
+            formatted_text = (
+                f"• {user} | {action} | {formatted_timestamp}\n"
+                f"{message_text}\n\n"
+            )
 
         output.append(formatted_text)
 
