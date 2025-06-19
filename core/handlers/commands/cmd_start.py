@@ -10,6 +10,6 @@ async def start_command(message: types.Message):
         "<b><u>Phroggy</u></b>\n\n"
         "I’m your AI-powered group guard — built to block shady links, sketchy files, "
         "and also spammy messages using a highly accurate pretrained model.\n\n"
-        "Want to see what I can do?\n"
+        "<b>Want to see what I can do?</b>\n"
         "Check the /help command and let’s keep your group clean and secure."
     )
