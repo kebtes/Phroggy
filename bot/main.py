@@ -30,7 +30,13 @@ from db import mongo
 
 timeout = ClientTimeout(total=60)
 
+from loguru import logger
+
+from logger.logger import init_logger, log_sink
+
+
 async def main():
+    await init_logger()
     bot = Bot(
         token=BOT_TOKEN,
         timeout=timeout,
@@ -42,8 +48,12 @@ async def main():
     register_handlers(dp)
     await set_bot_commands(bot)
 
-    print("Bot is up and running...")
-    await dp.start_polling(bot)
+    logger.info("Bot is up and running...")
+    try:
+        await dp.start_polling(bot)
+    finally:
+        logger.info("Shutting down...")
+        await log_sink.stop()
 
     # db logics
     await mongo.init()
