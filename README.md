@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/5ecbfdd7-c7d8-4086-9ccd-d64dec9b6b08" alt="phroggy_banner" />
+  <img src="assets\phroggy_banner.png" alt="phroggy_banner" />
 </p>
 
 <div align="center">
@@ -20,7 +20,6 @@
   </a>
 </p>
 
-  
 # Phroggy
 
 **Your group’s low-key bodyguard — blocking spam, spotting malware, and checking suspicious files with just a forward.**
