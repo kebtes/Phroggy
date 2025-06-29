@@ -20,7 +20,6 @@
   </a>
 </p>
 
-  
 # Phroggy
 
 **Your group’s low-key bodyguard — blocking spam, spotting malware, and checking suspicious files with just a forward.**
