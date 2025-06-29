@@ -26,7 +26,3 @@ Phroggy is an AI-powered Telegram bot designed to protect your group chats by bl
 - Blocks spammy messages before they annoy your group  
 - Detects and flags malicious or suspicious files  
 - Scans forwarded files instantly for malware  
-
-## Links
-- Telegram Bot: [Link](https://t.me/Phroggy_Bot)
-- Updates Channel: [Link](https://t.me/Phroggy_Updates)
