@@ -1,19 +1,20 @@
 from datetime import datetime
 from typing import Optional
 
+from loguru import logger
 from pydantic import ValidationError
 
 from db import defaults, schemas
 from db.mongo import groups_collection
 
-from loguru import logger
+
 async def group_exists(group_id: int):
     """Returns the group if it exists, else None"""
     try:
         group = await groups_collection.find_one({"group_id": group_id})
 
     except Exception as e:
-        return {"error": "USER_LOOK_UP_FAILED", "data": e}
+        return {"error": "GROUP_LOOK_UP_FAILED", "data": e}
 
     return group
 
