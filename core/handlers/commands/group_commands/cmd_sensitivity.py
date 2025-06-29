@@ -11,6 +11,13 @@ async def id_group(message: types.Message, command: CommandObject):
     user_id = message.from_user.id
     group_id = message.chat.id
 
+    if await groups.group_exists(group_id):
+        await message.reply(
+            "<b>Phroggy hasn't been linked to the group yet.</b>\n\n"
+            "Go to the bot and link the group first, @Phroggy_Bot"
+        )
+        return
+
     if not (await groups.is_admin(group_id, user_id) or await groups.is_moderator(group_id, user_id)):
         await message.reply("Commands are only available to admins/moderators.")
         return

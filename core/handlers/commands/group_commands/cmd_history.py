@@ -9,6 +9,13 @@ from db import groups
 async def id_group(message: types.Message):
     group_id = message.chat.id
 
+    if await groups.group_exists(group_id):
+        await message.reply(
+            "<b>Phroggy hasn't been linked to the group yet.</b>\n\n"
+            "Go to the bot and link the group first, @Phroggy_Bot"
+        )
+        return
+
     logs = await groups.get_log(group_id)
 
     if logs:
