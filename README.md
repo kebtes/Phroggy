@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/b6b9394b-6ff2-4d3e-9782-fda1aeffdb7e" alt="phroggy_banner" />
+  <img src="https://github.com/user-attachments/assets/5ecbfdd7-c7d8-4086-9ccd-d64dec9b6b08" alt="phroggy_banner" />
 </p>
 
 # Phroggy
