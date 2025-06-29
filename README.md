@@ -4,7 +4,7 @@
 
 <div align="center">
   
-  [![Telegram Bot](https://img.shields.io/badge/Phroggy%20Bot-FFFFFF?logo=telegram&logoColor=black)](https://t.me/Phroggy_Bot)
+  [![Telegram Bot](https://img.shields.io/badge/Phroggy%20Bot-FFFFFF?logo=telegram&logoColor=black.svg)](https://t.me/Phroggy_Bot)
   [![Telegram Bot](https://img.shields.io/badge/Phroggy%20Updates-FFFFFF?logo=telegram&logoColor=black)](https://t.me/Phroggy_Updates)
   
 </div>
