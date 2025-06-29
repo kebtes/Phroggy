@@ -14,7 +14,12 @@
   <a href="https://app.codacy.com?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade">
     <img src="https://app.codacy.com/project/badge/Grade/ca763c400e9d4795b666f606595cc175" alt="Codacy Badge" />
   </a>
+
+  <a href="https://github.com/kebtes/Phroggy/security/code-scanning">
+    <img src="https://github.com/kebtes/Phroggy/actions/workflows/codeql-analysis.yml/badge.svg" alt="CodeQL Scan">
+  </a>
 </p>
+
   
 # Phroggy
 
