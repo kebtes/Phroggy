@@ -18,6 +18,7 @@
   <a href="https://github.com/kebtes/Phroggy/security/code-scanning">
     <img src="https://github.com/kebtes/Phroggy/actions/workflows/codeql-analysis.yml/badge.svg" alt="CodeQL Scan">
   </a>
+  
 </p>
 
 # Phroggy
