@@ -4,27 +4,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-BOT_TOKEN = os.getenv("BOT_TOKEN").replace("\\x3a", ":")
-VIRUS_TOTAL_API_KEY = os.getenv("VIRUS_TOTAL_API_KEY")
-SAFE_BROWSING_API_KEY = os.getenv("SAFE_BROWSING_API_KEY")
-MONGO_DB_CONNECTION_STRING = os.getenv("MONGO_DB_CONNECTION_STRING")
-BETTER_STACK_INGESTING_HOST = os.getenv("BETTER_STACK_INGESTING_HOST")
-BETTER_STACK_SOURCE_TOKEN = os.getenv("BETTER_STACK_SOURCE_TOKEN")
+def get_env(key: str, fallback: str = None, required: bool = True):
+    value = os.getenv(key, fallback)
+    if required and not value:
+        raise ValueError(f"{key} not found in environment variables")
+    return value
 
-if not BOT_TOKEN:
-    raise ValueError("BOT_TOKEN not found in environment variables")
 
-if not VIRUS_TOTAL_API_KEY:
-    raise ValueError("VIRUS_TOTAL_API_KEY not found in environment variables")
+BOT_TOKEN = get_env("BOT_TOKEN", "dummy-bot-token")
+VIRUS_TOTAL_API_KEY = get_env("VIRUS_TOTAL_API_KEY", "dummy-virus-api-key")
+SAFE_BROWSING_API_KEY = get_env("SAFE_BROWSING_API_KEY", "dummy-safe-browsing-key")
+MONGO_DB_CONNECTION_STRING = get_env("MONGO_DB_CONNECTION_STRING", "mongodb://localhost:27017")
+BETTER_STACK_INGESTING_HOST = get_env("BETTER_STACK_INGESTING_HOST", "logs.betterstack.dev")
+BETTER_STACK_SOURCE_TOKEN = get_env("BETTER_STACK_SOURCE_TOKEN", "dummy-betterstack-token")
+WEBHOOK_SECRET = get_env("WEBHOOK_SECRET", "phroggy_secret")
 
-if not SAFE_BROWSING_API_KEY:
-    raise ValueError("SAFE_BROWSING_API_KEY not found in environment variables")
-
-if not MONGO_DB_CONNECTION_STRING:
-    raise ValueError("MONGO_DB_CONNECTION_STRING not found in environment variables")
-
-if not BETTER_STACK_INGESTING_HOST:
-    raise ValueError("BETTER_STACK_INGESTING_HOST not found in environment variables")
-
-if not BETTER_STACK_SOURCE_TOKEN:
-    raise ValueError("BETTER_STACK_SOURCE_TOKEN not found in environment variables")
+PORT = int(os.getenv("PORT", 3000))
+USE_WEBHOOK = os.getenv("USE_WEBHOOK", "false").lower() == "true"
