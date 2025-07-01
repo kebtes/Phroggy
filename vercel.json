@@ -1,13 +1,14 @@
 {
-    "functions": {
-        "api/webhook.py":{
-            "runtime": "python 3.10"
-        }
-    },
-    "routes": [
-        {
-            "src": "/api/webhook",
-            "dest": "/api/webhook.py"
-        }
-    ]
+  "buildCommand": "./scripts/build.sh",
+  "functions": {
+    "api/webhook.py": {
+      "runtime": "vercel-python@0.5.0"
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/webhook",
+      "dest": "api/webhook.py"
+    }
+  ]
 }
