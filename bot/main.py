@@ -97,6 +97,7 @@ if __name__ == "__main__":
     if USE_WEBHOOK:
         # Run in webhook mode
         app = create_app()
+        webhook = "0.0.0.0" if USE_WEBHOOK else "127.0.01"
         web.run_app(app, host="0.0.0.0", port=secrets.PORT)
     else:
         # Run in long polling mode
